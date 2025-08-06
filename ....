@@ -8,6 +8,57 @@ local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "ModernRebirthUI"
 gui.ResetOnSpawn = false
 
+-- MODE D'EMPLOI
+local instructionFrame = Instance.new("Frame", gui)
+instructionFrame.Size = UDim2.new(0, 420, 0, 250)
+instructionFrame.Position = UDim2.new(0.5, -210, 0.5, -125)
+instructionFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+instructionFrame.ZIndex = 5
+
+local instructionCorner = Instance.new("UICorner", instructionFrame)
+instructionCorner.CornerRadius = UDim.new(0, 12)
+
+local instructionText = Instance.new("TextLabel", instructionFrame)
+instructionText.Size = UDim2.new(1, -40, 1, -100)
+instructionText.Position = UDim2.new(0, 20, 0, 20)
+instructionText.TextWrapped = true
+instructionText.TextYAlignment = Enum.TextYAlignment.Top
+instructionText.Text = "Instructions:\n\n1. Click the + button in the top left to open the menu.\n2. Press 'Give Money' to add currency.\n3. Press 'Start' to automate rebirth.\n4. Use 'Free Infinite Rebirth' to loop rebirths.\n5. Use 'Stop Infinite Rebirth' to stop the loop.\n\nThe menu is draggable and works on both PC and mobile."
+instructionText.TextColor3 = Color3.new(1, 1, 1)
+instructionText.BackgroundTransparency = 1
+instructionText.Font = Enum.Font.Gotham
+instructionText.TextSize = 18
+instructionText.ZIndex = 6
+
+local byText = Instance.new("TextLabel", instructionFrame)
+byText.Size = UDim2.new(1, 0, 0, 20)
+byText.Position = UDim2.new(0, 0, 1, -25)
+byText.BackgroundTransparency = 1
+byText.Text = "by Shido"
+byText.Font = Enum.Font.GothamSemibold
+byText.TextSize = 16
+byText.TextColor3 = Color3.new(1, 1, 1)
+byText.TextTransparency = 0.1
+byText.ZIndex = 6
+
+local okButton = Instance.new("TextButton", instructionFrame)
+okButton.Size = UDim2.new(0, 100, 0, 35)
+okButton.Position = UDim2.new(0.5, -50, 1, -65)
+okButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+okButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+okButton.Font = Enum.Font.GothamBold
+okButton.Text = "OK"
+okButton.TextSize = 20
+okButton.ZIndex = 6
+
+local okCorner = Instance.new("UICorner", okButton)
+okCorner.CornerRadius = UDim.new(0, 8)
+
+okButton.MouseButton1Click:Connect(function()
+	instructionFrame:Destroy()
+end)
+
+-- GUI PRINCIPAL
 local toggleButton = Instance.new("TextButton", gui)
 toggleButton.Size = UDim2.new(0, 40, 0, 40)
 toggleButton.Position = UDim2.new(0, 10, 0, 40)
@@ -142,12 +193,10 @@ freeRebirthBtn.MouseButton1Click:Connect(function()
 	local BuyRebirthRE = ReplicatedStorage.Remotes:WaitForChild("BuyRebirthRE")
 	task.spawn(function()
 		while infiniteRunning do
-			for _ = 0, 005 do
-				pcall(function()
-					BuyRebirthRE:InvokeServer(0)
-				end)
-			end
-			RunService.Heartbeat:Wait()
+			pcall(function()
+				BuyRebirthRE:InvokeServer(0)
+			end)
+			wait(0)
 		end
 	end)
 end)
