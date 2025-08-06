@@ -1,0 +1,157 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "ModernRebirthUI"
+gui.ResetOnSpawn = false
+
+local toggleButton = Instance.new("TextButton", gui)
+toggleButton.Size = UDim2.new(0, 40, 0, 40)
+toggleButton.Position = UDim2.new(0, 10, 0, 40)
+toggleButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextSize = 24
+toggleButton.Text = "+"
+
+local toggleCorner = Instance.new("UICorner", toggleButton)
+toggleCorner.CornerRadius = UDim.new(1, 0)
+
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 320, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -130)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.Visible = false
+
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0, 12)
+
+local dragBar = Instance.new("TextLabel", mainFrame)
+dragBar.Size = UDim2.new(1, 0, 0, 30)
+dragBar.BackgroundTransparency = 1
+dragBar.Text = "by Shido"
+dragBar.TextColor3 = Color3.new(1, 1, 1)
+dragBar.Font = Enum.Font.GothamMedium
+dragBar.TextSize = 18
+
+local line = Instance.new("Frame", mainFrame)
+line.Position = UDim2.new(0, 0, 0, 30)
+line.Size = UDim2.new(1, 0, 0, 1)
+line.BackgroundColor3 = Color3.new(1, 1, 1)
+line.BorderSizePixel = 0
+
+local function createButton(name, posY)
+	local btn = Instance.new("TextButton", mainFrame)
+	btn.Size = UDim2.new(0.8, 0, 0, 35)
+	btn.Position = UDim2.new(0.1, 0, 0, posY)
+	btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+	btn.Font = Enum.Font.GothamBold
+	btn.Text = name
+	btn.TextSize = 18
+	btn.BorderSizePixel = 0
+	local c = Instance.new("UICorner", btn)
+	c.CornerRadius = UDim.new(0, 6)
+	return btn
+end
+
+local startBtn = createButton("Start", 40)
+local stopBtn = createButton("Stop", 85)
+local giveMoneyBtn = createButton("Give Money", 130)
+local freeRebirthBtn = createButton("Free Infinite Rebirth", 175)
+local stopFreeBtn = createButton("Stop Infinite Rebirth", 220)
+
+local dragging, dragInput, dragStart, startPos
+
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+dragBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+dragBar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		updateDrag(input)
+	end
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = not mainFrame.Visible
+	toggleButton.Text = mainFrame.Visible and "-" or "+"
+end)
+
+local running = false
+local infiniteRunning = false
+
+startBtn.MouseButton1Click:Connect(function()
+	if running then return end
+	running = true
+
+	local BuyRebirthRE = ReplicatedStorage.Remotes:WaitForChild("BuyRebirthRE")
+	local Purchase = ReplicatedStorage.Remotes:WaitForChild("Purchase")
+	local BuyMegaReirthRE = ReplicatedStorage.Remotes:WaitForChild("BuyMegaReirthRE")
+
+	task.spawn(function()
+		while running do
+			pcall(function()
+				BuyRebirthRE:InvokeServer(-999999999999999999999999999999999)
+				Purchase:FireServer("Mega Rebirth Zone")
+				BuyMegaReirthRE:InvokeServer()
+			end)
+			task.wait()
+		end
+	end)
+end)
+
+stopBtn.MouseButton1Click:Connect(function()
+	running = false
+end)
+
+giveMoneyBtn.MouseButton1Click:Connect(function()
+	local BuyRebirthRE = ReplicatedStorage.Remotes:WaitForChild("BuyRebirthRE")
+	pcall(function()
+		BuyRebirthRE:InvokeServer(-9e+33)
+	end)
+end)
+
+freeRebirthBtn.MouseButton1Click:Connect(function()
+	if infiniteRunning then return end
+	infiniteRunning = true
+	local BuyRebirthRE = ReplicatedStorage.Remotes:WaitForChild("BuyRebirthRE")
+	task.spawn(function()
+		while infiniteRunning do
+			for _ = 0, 005 do
+				pcall(function()
+					BuyRebirthRE:InvokeServer(0)
+				end)
+			end
+			RunService.Heartbeat:Wait()
+		end
+	end)
+end)
+
+stopFreeBtn.MouseButton1Click:Connect(function()
+	infiniteRunning = false
+end)
